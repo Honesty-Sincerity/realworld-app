@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import passport from "passport";
-import { deflate } from "zlib";
 
 const router = express.Router();
 

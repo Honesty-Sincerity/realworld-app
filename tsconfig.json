@@ -25,6 +25,9 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "src",
     "paths": {
+      "@/features/*": ["features/*"],
+      "@/models/*": ["models/*"],
+      "@/pages/*": ["pages/*"],
       "@/utils/*": ["utils/*"]
     }
   },
