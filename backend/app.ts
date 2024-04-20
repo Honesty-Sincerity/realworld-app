@@ -2,9 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import testDataRoutes from "./routes/testdata-routes";
-import { getBackendPort } from "../src/utils/portUtils";
 import session from "express-session";
 import passport from "passport";
+import { getBackendPort } from "../src/utils";
 
 const app = express();
 

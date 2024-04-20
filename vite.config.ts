@@ -20,6 +20,7 @@ export default defineConfig((config) => {
     resolve: {
       alias: {
         "@features": "/src/features",
+        "@machines": "/src/machines",
         "@models": "/src/models",
         "@pages": "/src/pages",
         "@utils": "/src/utils",
