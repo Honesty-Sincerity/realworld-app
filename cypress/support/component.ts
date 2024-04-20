@@ -29,5 +29,9 @@ import { mount } from "cypress/react18";
 
 Cypress.Commands.add("mount", mount);
 
+Cypress.Commands.add("getByData", (dataTestId) => {
+  return cy.get(`[data-testid*="${dataTestId}"]`);
+});
+
 // Example use:
 // cy.mount(<MyComponent />)

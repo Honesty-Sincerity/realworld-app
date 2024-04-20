@@ -1,3 +1,4 @@
+import { MemoryRouter } from "react-router-dom";
 import { SignInForm } from "./SignInForm";
 
 describe("SignInForm", () => {
@@ -21,5 +22,18 @@ describe("SignInForm", () => {
     }).as("loginPost");
   });
 
-  it("submits the username and password to the backend", () => {});
+  it("submits the username and password to the backend", () => {
+    cy.mount(
+      <MemoryRouter>
+        <SignInForm />
+      </MemoryRouter>
+    );
+    cy.getByData("signin-username").type("Katharina_Bernier");
+    cy.getByData("signin-signin-password").type("s3cret");
+    cy.getByData("signin-submit]").click(); //.should("be.disabled");
+
+    cy.wait("@loginPost");
+
+    cy.get("signin-error").should("not.exist");
+  });
 });
