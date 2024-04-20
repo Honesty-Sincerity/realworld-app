@@ -23,6 +23,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
+    "types": ["cypress"],
     "baseUrl": "src",
     "paths": {
       "@/features/*": ["features/*"],
@@ -31,5 +32,5 @@
       "@/utils/*": ["utils/*"]
     }
   },
-  "include": ["src", "backend"]
+  "include": ["src", "backend", "cypress.d.ts"]
 }

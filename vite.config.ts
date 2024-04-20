@@ -25,5 +25,10 @@ export default defineConfig((config) => {
         "@utils": "/src/utils",
       },
     },
+    test: {
+      environment: "jsdom",
+      setupFiles: "./src/setup-tests.ts",
+      exclude: ["node_modules", "cypress", "dist"],
+    },
   };
 });
