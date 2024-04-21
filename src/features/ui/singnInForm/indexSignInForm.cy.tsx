@@ -1,5 +1,5 @@
 import { MemoryRouter } from "react-router-dom";
-import { SignInForm } from "./SignInForm";
+import { SignInForm } from ".";
 import { createActor } from "xstate";
 import { authMachine } from "@machines/authMachine";
 

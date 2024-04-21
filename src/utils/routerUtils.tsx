@@ -1,4 +1,5 @@
-import { SignInForm } from "@features/ui/singnInForm/SignInForm";
+import { SignInForm } from "@features/ui";
+import { authMachine } from "@machines/authMachine";
 import { BrowserHistory } from "history";
 import { ReactNode, useLayoutEffect, useState } from "react";
 import { Navigate, Route, Router, Routes } from "react-router-dom";
@@ -33,7 +34,7 @@ export const RouterWrap = ({
 export const AuthRouter = () => {
   return (
     <Routes>
-      <Route index path="/signin" element={<SignInForm />} />
+      <Route index path="/signin" element={<SignInForm authMachine={authMachine} />} />
       <Route index path="/*" element={<Navigate to="/signin" replace />} />
     </Routes>
   );
