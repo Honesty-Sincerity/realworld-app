@@ -1,8 +1,15 @@
 import { MemoryRouter } from "react-router-dom";
 import { SignInForm } from "./SignInForm";
+import { createActor } from "xstate";
+import { authMachine } from "@machines/authMachine";
 
 describe("SignInForm", () => {
+  let authService;
   beforeEach(() => {
+    authService = createActor(authMachine);
+    authService.start();
+    expect(authService.getSnapshot().value).equal("unauthorized");
+
     cy.intercept("POST", "http://localhost:3001/login", {
       user: {
         id: "t45AiwidW",
