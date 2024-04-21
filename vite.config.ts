@@ -23,6 +23,7 @@ export default defineConfig((config) => {
         "@machines": "/src/machines",
         "@models": "/src/models",
         "@pages": "/src/pages",
+        "@styles": "/src/styles",
         "@utils": "/src/utils",
       },
     },

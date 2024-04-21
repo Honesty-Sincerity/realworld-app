@@ -30,6 +30,7 @@
       "@machines/*": ["machines/*"],
       "@models/*": ["models/*"],
       "@pages/*": ["pages/*"],
+      "@styles/*": ["styles/*"],
       "@utils/*": ["utils/*"]
     }
   },
