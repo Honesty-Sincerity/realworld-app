@@ -3,10 +3,22 @@
 .signInContainer {
   width: 100%;
   margin: auto;
-  background-color: antiquewhite;
-  height: 200px;
+
+  @include G.breakpoint("xm") {
+    padding: 0 24px;
+  }
 
   @include G.breakpoint("xxl") {
     max-width: 1920px;
+  }
+
+  .paper {
+    @include G.flexAlignCenter;
+    flex-direction: column;
+    margin-top: 64px;
+
+    .alert {
+      @include G.alert;
+    }
   }
 }

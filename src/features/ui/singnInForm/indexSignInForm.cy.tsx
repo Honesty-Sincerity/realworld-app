@@ -10,7 +10,7 @@ describe("SignInForm", () => {
     authService.start();
     expect(authService.getSnapshot().value).equal("unauthorized");
 
-    cy.intercept("POST", "http://localhost:3001/login", {
+    cy.intercept("POST", "http://localhost:4001/login", {
       user: {
         id: "t45AiwidW",
         uuid: "6383f84e-b511-44c5-a835-3ece1d781fa8",
@@ -36,8 +36,8 @@ describe("SignInForm", () => {
       </MemoryRouter>
     );
     cy.getByData("signin-username").type("Katharina_Bernier");
-    cy.getByData("signin-signin-password").type("s3cret");
-    cy.getByData("signin-submit]").click(); //.should("be.disabled");
+    cy.getByData("signin-password").type("s3cret");
+    cy.getByData("signin-submit").click(); //.should("be.disabled");
 
     cy.wait("@loginPost");
 

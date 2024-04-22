@@ -13,3 +13,13 @@ $breakpoints: (
     @content;
   }
 }
+
+@mixin flexAlignCenter {
+  display: flex;
+  align-items: center;
+}
+
+@mixin alert {
+  @include flexAlignCenter;
+  padding: 6px 16px;
+}
