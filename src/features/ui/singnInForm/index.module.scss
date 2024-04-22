@@ -1,5 +1,12 @@
+@use "@styles/globalStyles.scss" as G;
+
 .signInContainer {
-  max-width: 1440px;
   width: 100%;
   margin: auto;
+  background-color: antiquewhite;
+  height: 200px;
+
+  @include G.breakpoint("xxl") {
+    max-width: 1920px;
+  }
 }

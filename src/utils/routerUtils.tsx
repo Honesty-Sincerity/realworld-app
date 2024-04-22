@@ -34,7 +34,7 @@ export const RouterWrap = ({
 export const AuthRouter = () => {
   return (
     <Routes>
-      <Route index path="/signin" element={<SignInForm authMachine={authMachine} />} />
+      <Route index path="/signin" element={<SignInForm />} />
       <Route index path="/*" element={<Navigate to="/signin" replace />} />
     </Routes>
   );
