@@ -1,4 +1,4 @@
-import { User } from "@models/user";
+import { SignInPayload, User } from "@models/user";
 import { httpClient } from "@utils/asyncUtils";
 import { history } from "@utils/historyUtils";
 import { backendPort } from "@utils/portUtils";
@@ -24,7 +24,8 @@ export const authMachine = setup({
     })),
   },
   actors: {
-    performLogin: fromCallback(({ input, sendBack }) => {
+    performLogin: fromCallback(({ input, sendBack }: { input: SignInPayload; sendBack: any }) => {
+      console.log("dataa---->>>", input);
       httpClient
         .post(`https://localhost:${backendPort}/login`, input)
         .then(({ data }) => {
@@ -32,7 +33,8 @@ export const authMachine = setup({
           sendBack(data);
         })
         .catch(() => {
-          throw new Error("Username or password is invalid");
+          sendBack({ message: "Username or password is invalid" });
+          // throw new Error("Username or password is invalid");
         });
     }),
   },
@@ -53,6 +55,14 @@ export const authMachine = setup({
     loading: {
       invoke: {
         src: "performLogin",
+        input: ({ event }: { event: any }) => {
+          console.log("event-0---", event);
+          return {
+            password: event.password,
+            username: event.username,
+            remember: event.remember,
+          };
+        },
       },
     },
   },

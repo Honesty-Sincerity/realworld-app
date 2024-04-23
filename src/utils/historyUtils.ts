@@ -1,8 +1,4 @@
-import { createBrowserHistory } from "history";
+import { createBrowserHistory, createMemoryHistory } from "history";
 
-let history;
-if (typeof document !== "undefined") {
-  history = createBrowserHistory();
-}
-
-export default history;
+export const history =
+  typeof window !== "undefined" ? createBrowserHistory() : createMemoryHistory();
