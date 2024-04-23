@@ -36,10 +36,6 @@ passport.deserializeUser((id: string, done) => {
   done(null, user);
 });
 
-router.get("/log", () => {
-  console.log("This is test link");
-});
-
 // authentication routes
 router.post("/login", passport.authenticate("local"), (req: Request, res: Response): void => {
   console.log("Here is login router");

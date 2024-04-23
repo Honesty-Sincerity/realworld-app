@@ -1,7 +1,8 @@
-import { SignInPayload, User } from "@models/user";
+import { SignInPayload, SignUpPayload, User } from "@models/user";
 import { httpClient } from "@utils/asyncUtils";
 import { history } from "@utils/historyUtils";
 import { backendPort } from "@utils/portUtils";
+import { omit } from "lodash";
 import { assign, fromCallback, setup } from "xstate";
 
 export interface AuthMachineContext {
@@ -37,6 +38,11 @@ export const authMachine = setup({
           // throw new Error("Username or password is invalid");
         });
     }),
+    performSignup: fromCallback(({ input, sendBack }) => {
+      console.log("singup dataa---->>>", input);
+      // const payload = omit("type", input)
+      // httpClient.
+    }),
   },
 }).createMachine({
   id: "authentication",
@@ -50,18 +56,26 @@ export const authMachine = setup({
       entry: "resetUser",
       on: {
         LOGIN: "loading",
+        SIGNUP: "signup",
       },
     },
     loading: {
       invoke: {
         src: "performLogin",
         input: ({ event }: { event: any }) => {
-          console.log("event-0---", event);
           return {
             password: event.password,
             username: event.username,
             remember: event.remember,
           };
+        },
+      },
+    },
+    signup: {
+      invoke: {
+        src: "performSignup",
+        input: ({ event }: { event: any }) => {
+          return omit(event, "type");
         },
       },
     },
