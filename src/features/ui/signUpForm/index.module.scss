@@ -1,0 +1,37 @@
+@use "@styles/globalStyles.scss" as G;
+
+.signInContainer {
+  width: 100%;
+  margin: auto;
+
+  @include G.breakpoint("xm") {
+    padding: 0 24px;
+  }
+
+  @include G.breakpoint("xxl") {
+    max-width: 1920px;
+  }
+
+  .paper {
+    @include G.flexAlignCenter;
+    flex-direction: column;
+    margin-top: 64px;
+
+    .alert {
+      @include G.alert;
+
+      margin-bottom: 16px;
+      color: rgb(97, 26, 21);
+      background-color: rgb(254, 236, 234);
+      gap: 8;
+
+      .alertIcon {
+        color: #f44336;
+        opacity: 0.9;
+        padding: 7px 0;
+        font-size: 22px;
+        margin-right: 12px;
+      }
+    }
+  }
+}
