@@ -16,7 +16,7 @@ export interface User {
   balance: number;
   avatar: string;
   defaultPrivacyLevel: DefaultPrivacyLevel;
-  createAt: Date;
+  createdAt: Date;
   modifiedAt: Date;
 }
 
@@ -29,7 +29,4 @@ export type SignInPayload = Pick<User, "username" | "password"> & {
   remember?: Boolean;
 };
 
-export type SignUpPayload = Pick<
-  User,
-  "username" | "password" | "firstName" | "lastName"
->;
+export type SignUpPayload = Pick<User, "username" | "password" | "firstName" | "lastName">;

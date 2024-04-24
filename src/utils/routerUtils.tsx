@@ -33,9 +33,9 @@ export const RouterWrap = ({
 export const AuthRouter = () => {
   return (
     <Routes>
-      <Route path="/signin" element={<SignInForm />} />
+      <Route index path="/signin" element={<SignInForm />} />
       <Route path="/signup" element={<SignUpForm />} />
-      {/* <Route index path="/*" element={<Navigate to="/signin" replace />} /> */}
+      <Route index path="/*" element={<Navigate to="/signin" replace />} />
     </Routes>
   );
 };

@@ -25,23 +25,24 @@ export const authMachine = setup({
     })),
   },
   actors: {
-    performLogin: fromCallback(({ input, sendBack }: { input: SignInPayload; sendBack: any }) => {
+    performLogin: fromCallback(({ input, sendBack }) => {
       console.log("dataa---->>>", input);
       httpClient
-        .post(`https://localhost:${backendPort}/login`, input)
+        .post(`http://localhost:${backendPort}/login`, input)
         .then(({ data }) => {
           history.push("/");
           sendBack(data);
         })
         .catch(() => {
-          sendBack({ message: "Username or password is invalid" });
-          // throw new Error("Username or password is invalid");
+          // sendBack({ message: "Username or password is invalid" });
+          throw new Error("Username or password is invalid");
         });
     }),
     performSignup: fromCallback(({ input, sendBack }) => {
-      console.log("singup dataa---->>>", input);
-      // const payload = omit("type", input)
-      // httpClient.
+      httpClient.post(`http://localhost:${backendPort}/users`, input).then(({ data }) => {
+        history.push("/signin");
+        sendBack(data);
+      });
     }),
   },
 }).createMachine({
@@ -63,11 +64,7 @@ export const authMachine = setup({
       invoke: {
         src: "performLogin",
         input: ({ event }: { event: any }) => {
-          return {
-            password: event.password,
-            username: event.username,
-            remember: event.remember,
-          };
+          return omit(event, "type");
         },
       },
     },

@@ -11,7 +11,8 @@ export const validateMiddleware = (validations: any[]) => {
 
     const errors = validationResult(req);
     if (errors.isEmpty()) {
-      return next;
+      console.log("validateor------");
+      return next();
     }
 
     res.status(422).json({ errors: errors.array() });

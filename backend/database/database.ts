@@ -1,73 +1,85 @@
-import fs from "fs";
-import path from "path";
-import low from "lowdb";
-import FileSync from "lowdb/adapters/FileSync";
-import bcrypt from "bcryptjs";
-import shortId from "shortid";
-import { v4 } from "uuid";
-import { remove } from "lodash";
-import { DbSchema } from "../../src/models/db-schema";
-import { User } from "../../src/models/user";
+// // import fs from "fs";
+// import path from "path";
+// import { JSONFileSyncPreset } from "lowdb/node";
+// import bcrypt from "bcryptjs";
+// import shortId from "shortid";
+// import { v4 } from "uuid";
+// import { remove } from "lodash";
+// import { DbSchema } from "../../src/models/db-schema";
+// import { User } from "../../src/models/user";
 
-const USER_TABLE = "users";
+// const USER_TABLE = "users";
 
-const databaseFile = path.join(__dirname, "../../data/database.json");
-const adapter = new FileSync<DbSchema>(databaseFile);
+// type Data = {
+//   users: User[];
+// };
 
-const db = low(adapter);
+// const defaultData: Data = { users: [] };
 
-export const seedDatabase = () => {
-  const testSeed = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "data", "database-seed.json"), "utf-8")
-  );
+// const databaseFile = path.join(__dirname, "../../data/database.json");
 
-  // seed database with test data
-  db.setState(testSeed).write();
-  return;
-};
+// const db = JSONFileSyncPreset<Data>(databaseFile, defaultData);
 
-export const getAllUsers = () => db.get(USER_TABLE).value();
+// export const seedDatabase = () => {
+//   // const testSeed = JSON.parse(
+//   //   fs.readFileSync(path.join(process.cwd(), "data", "database-seed.json"), "utf-8")
+//   // );
 
-export const getAllForEntity = (entity: keyof DbSchema) => db.get(entity).value();
+//   // seed database with test data
+//   // db.setState(testSeed).write();
+//   return;
+// };
 
-export const getBy = (entity: keyof DbSchema, key: string, value: any) => {
-  const result = db
-    .get(entity)
-    .find({ [`${key}`]: value })
-    .value();
+// export const getAllUsers = () => db.data.users;
 
-  return result;
-};
+// export const getAllForEntity = (entity: keyof DbSchema) => {
+//   return entity;
+// };
 
-export const removeUserFromResults = (userId: User["id"], results: User[]) =>
-  remove(results, { id: userId });
+// export const getBy = (entity: keyof DbSchema, key: string, value: any) => {
+//   // const result = db
+//   //   .get(entity)
+//   //   .find({ [`${key}`]: value })
+//   //   .value();
 
-//User
-export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);
-export const getuserById = (id: string) => getUserBy("id", id);
+//   return { entity, key, value };
+// };
 
-export const createUser = (userDetails: Partial<User>): User => {
-  const password = bcrypt.hashSync(userDetails.password!, 10);
-  const user: User = {
-    id: shortId(),
-    uuid: v4(),
-    firstName: userDetails.firstName!,
-    lastName: userDetails.lastName!,
-    username: userDetails.username!,
-    password,
-    email: userDetails.email!,
-    phoneNumber: userDetails.phoneNumber!,
-    balance: userDetails.balance! || 0,
-    avatar: userDetails.avatar!,
-    defaultPrivacyLevel: userDetails.defaultPrivacyLevel!,
-    createAt: new Date(),
-    modifiedAt: new Date(),
-  };
+// export const removeUserFromResults = (userId: User["id"], results: User[]) =>
+//   remove(results, { id: userId });
 
-  saveUser(user);
-  return user;
-};
+// //User
+// export const getUserBy = (key: string, value: any) => {
+//   return getBy(USER_TABLE, key, value);
+// };
+// export const getuserById = (id: string) => getUserBy("id", id);
 
-const saveUser = (user: User) => {
-  db.get(USER_TABLE).push(user).write();
-};
+// export const createUser = (userDetails: Partial<User>): User => {
+//   const password = bcrypt.hashSync(userDetails.password!, 10);
+//   const user: User = {
+//     id: shortId(),
+//     uuid: v4(),
+//     firstName: userDetails.firstName!,
+//     lastName: userDetails.lastName!,
+//     username: userDetails.username!,
+//     password,
+//     email: userDetails.email!,
+//     phoneNumber: userDetails.phoneNumber!,
+//     balance: userDetails.balance! || 0,
+//     avatar: userDetails.avatar!,
+//     defaultPrivacyLevel: userDetails.defaultPrivacyLevel!,
+//     createAt: new Date(),
+//     modifiedAt: new Date(),
+//   };
+
+//   console.log("user----", user);
+
+//   saveUser(user);
+//   return user;
+// };
+
+// const saveUser = (user: User) => {
+//   return user;
+//   // db.get(USER_TABLE).push(user).write();
+//   // console.log(db.get(USER_TABLE).value());
+// };
