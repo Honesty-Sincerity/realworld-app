@@ -36,13 +36,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-const URL = process.env.MONGO_DB || "";
-console.log("URL", URL);
+const URI = process.env.MONGO_DB || "";
 
 mongoose
-  .connect(URL)
+  .connect(URI)
   .then(() => console.log(chalk.green("MongoDB connected!")))
-  .catch(() => console.log(chalk.red("MongoDB URL brokend!")));
+  .catch(() => console.log(chalk.red("MongoDB URI brokend!")));
 
 app.use(auth);
 

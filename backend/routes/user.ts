@@ -1,30 +1,72 @@
 ///<reference path="../types.ts"/>
 
 import express from "express";
-import { validateMiddleware } from "../helpers";
-// import { createUser } from "../database/database";
-import { isUserValidator, userFieldsValidator } from "../validators";
-// import { User } from "../../src/models/user";
-
+import { isEqual } from "lodash/fp";
+import { ensureAuthenticated, validateMiddleware } from "../helpers";
+import {
+  shortIdValidation,
+  searchValidation,
+  userFieldsValidator,
+  isUserValidator,
+} from "../validators";
+import { User } from "../../src/models/user";
 const router = express.Router();
 
-// router.get("/", ensureAuthenticated, (req, res) => {
-//   const users = removeUserFromResults(req.user?.id!, getAllUsers());
-//   res.status(200).json({ results: users });
-// });
+// Routes
+router.get("/", ensureAuthenticated, (req, res) => {
+  console.log(req.body);
+  res.status(200).json({ results: "aa" });
+});
 
-router.get("/", () => {
-  console.log("TEST LINK");
+router.get("/search", ensureAuthenticated, validateMiddleware([searchValidation]), (req, res) => {
+  const { q } = req.query;
+
+  console.log("q", q);
+
+  res.status(200).json({ results: "aa" });
 });
 
 router.post("/", userFieldsValidator, validateMiddleware(isUserValidator), (req, res) => {
-  console.log("thislik?", req.body);
-  // const userDetails: User = req.body;
-
-  // const user = createUser(userDetails);
+  const userDetails: User = req.body;
 
   res.status(201);
-  // res.json({ user: user });
+  res.json({ user: userDetails });
 });
+
+router.get(
+  "/:userId",
+  ensureAuthenticated,
+  validateMiddleware([shortIdValidation("userId")]),
+  (req, res) => {
+    const { userId } = req.params;
+    if (!isEqual(userId, req.user?.id)) {
+      return res.status(401).send({
+        error: "Unauthorized",
+      });
+    }
+    res.status(200);
+  }
+);
+
+router.get("/profile/:username", (req, res) => {
+  const { username } = req.params;
+
+  // const user = pick(["firstName", "lastName", "avatar"], getUserByUsername(username));
+
+  res.status(200);
+  res.json({ username });
+});
+
+router.patch(
+  "/:userId",
+  ensureAuthenticated,
+  userFieldsValidator,
+  validateMiddleware([shortIdValidation("userId"), ...isUserValidator]),
+  (req, res) => {
+    console.log(req.body);
+
+    res.sendStatus(204);
+  }
+);
 
 export default router;

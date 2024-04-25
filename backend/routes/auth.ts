@@ -1,42 +1,41 @@
 import express, { Request, Response } from "express";
 // import bcrypt from "bcryptjs";
 import passport from "passport";
-// import { getUserBy } from "../database/database";
-// import { User } from "../../src/models/user";
+import { getUserBy, getuserById } from "../database/database";
+import { User } from "../../src/models/user";
 
-// const LocalStrategy = require("passport-local").Strategy;
+const LocalStrategy = require("passport-local").Strategy;
 const router = express.Router();
 
 // configure passport for local strategy
-// passport.use(
-//   // new LocalStrategy((username: string, password: string, done: Function) => {
-//   new LocalStrategy((username: string, done: Function) => {
-//     // const user = getUserBy("username", username);
+passport.use(
+  new LocalStrategy((username: string, password: string, done: Function) => {
+    console.log(username, password);
+    const user = getUserBy("username", username);
 
-//     const failureMessage = "Incorrect username or password.";
-//     // if (!user) {
-//     //   console.log("user??????", user);
-//     //   return done(null, false, { message: failureMessage });
-//     // }
+    const failureMessage = "Incorrect username or password.";
+    if (!user) {
+      console.log("user??????", user);
+      return done(null, false, { message: failureMessage });
+    }
 
-//     //validate password
-//     // if (!bcrypt.compareSync(password, user.password)) {
-//     //   return done(null, false, { message: failureMessage });
-//     // }
+    //validate password
+    // if (!bcrypt.compareSync(password, user.password)) {
+    //   return done(null, false, { message: failureMessage });
+    // }
 
-//     return done(null, user);
-//   })
-// );
+    return done(null, user);
+  })
+);
 
-// passport.serializeUser((user: User, done) => {
-//   done(null, user.id);
-// });
+passport.serializeUser((user: User, done) => {
+  done(null, user.id);
+});
 
-// // passport.deserializeUser((id: string, done) => {
-// passport.deserializeUser(() => {
-//   // const user = getuserById(id);
-//   // done(null);
-// });
+passport.deserializeUser((id: string, done) => {
+  const user = getuserById(id);
+  done(null, user);
+});
 
 // authentication routes
 router.post("/login", passport.authenticate("local"), (req: Request, res: Response): void => {

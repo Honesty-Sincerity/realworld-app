@@ -1,6 +1,13 @@
-import { check, oneOf } from "express-validator";
+import { check, oneOf, query } from "express-validator";
+import { isValid } from "shortid";
+
+const isShortId = (value: string) => isValid(value);
+
+export const shortIdValidation = (key: string) => check(key).custom(isShortId);
 
 export const isValidEntityValidator = [check("entity").isIn(["users"]).trim()];
+
+export const searchValidation = query("q").exists();
 
 export const userFieldsValidator = oneOf([
   check("firstName").exists(),
