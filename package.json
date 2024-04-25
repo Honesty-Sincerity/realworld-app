@@ -14,7 +14,8 @@
     "prestart": "yarn db:seed:dev",
     "predev": "yarn db:seed:dev",
     "db:seed:dev": "yarn tsnode scripts/generateSeedData",
-    "db:seed:empty": "ncp ./data/empty-seed.json ./data/database.json"
+    "db:seed:empty": "yarn tsnode scripts/resetDatabase",
+    "db:seed:user:dev": "yarn tsnode scripts/generateUserSeedData"
   },
   "dependencies": {
     "@types/detect-port": "^1.3.5",
