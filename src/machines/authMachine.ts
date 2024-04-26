@@ -8,6 +8,7 @@ import { assign, fromCallback, fromPromise, setup } from "xstate";
 export interface AuthMachineContext {
   user?: User;
   message?: string;
+  mode?: boolean;
 }
 
 export type AuthMachineEvents =
@@ -15,7 +16,8 @@ export type AuthMachineEvents =
   | { type: "LOGOUT" }
   | { type: "UPDATE" }
   | { type: "REFRESH" }
-  | { type: "SIGNUP" };
+  | { type: "SIGNUP" }
+  | { type: "MODE"; value: boolean };
 
 export const authMachine = setup({
   types: { context: {} as AuthMachineContext, events: {} as AuthMachineEvents },
@@ -26,6 +28,12 @@ export const authMachine = setup({
     onError: assign(() => ({
       message: "Username or password is invalid",
     })),
+    onChange: assign({
+      mode: (event: any) => {
+        console.log(event.event.value);
+        return event.event.value;
+      },
+    }),
   },
   actors: {
     performLogin: fromPromise(async ({ input }) => {
@@ -54,22 +62,25 @@ export const authMachine = setup({
   context: {
     user: undefined,
     message: undefined,
+    mode: false,
   },
   states: {
     unauthorized: {
       entry: "resetUser",
       on: {
-        LOGIN: "loading",
+        LOGIN: "login",
         SIGNUP: "signup",
+        MODE: {
+          actions: "onChange",
+        },
       },
     },
-    loading: {
+    login: {
       invoke: {
         src: "performLogin",
         input: ({ event }: { event: any }) => {
           return omit(event, "type");
         },
-        // onError: { target: "unauthorized", actions: "onError" },
         onError: [
           {
             target: "unauthorized",

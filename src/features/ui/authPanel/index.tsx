@@ -2,50 +2,106 @@ import S from "./index.module.scss";
 import { TfiFacebook, TfiGithub, TfiGoogle, TfiLinkedin } from "react-icons/tfi";
 import clsx from "clsx";
 import { ChangeEvent, useEffect, useState } from "react";
-import { object, reach, string } from "yup";
+import { object, ref, string } from "yup";
+import { useMachine } from "@xstate/react";
+import { authMachine } from "@machines/authMachine";
 
 const signinValidationSchema = object({
   username: string().required("Username is required"),
   password: string().min(4, "Least 4 characters").required("Password is required"),
 });
 
-export const AuthPanel = () => {
-  const [active, setActive] = useState<boolean>(false);
-  const [activeLogin, setActiveLogin] = useState<boolean>(false);
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+const signupValidationSchema = object({
+  firstName: string().required("FirstName is required"),
+  lastName: string().required("LastName is required"),
+  username: string().required("Username is required"),
+  email: string().email("Invalid eamil format"),
+  password: string().min(4, "Least 4 characters").required("Password is required"),
+  confirmPassword: string()
+    .oneOf([ref("password"), ""], "Passwords must match")
+    .required("Confirm password is required"),
+});
 
-  const handleChange = async (e: ChangeEvent<HTMLInputElement>) => {
+export const AuthPanel = () => {
+  const [state, send] = useMachine(authMachine);
+  const [activeSignin, setActiveSignin] = useState<boolean>(false);
+  const [activeSignup, setActiveSignup] = useState<boolean>(false);
+  const [signinFormData, setSigninFormData] = useState({ username: "", password: "" });
+  const [signupFormData, setSignupFormData] = useState({
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [signinErrors, setSigninErrors] = useState<{ [key: string]: string }>({});
+  const [signupErrors, setSignupErrors] = useState<{ [key: string]: string }>({});
+
+  const handleSigninChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     try {
       await signinValidationSchema.validateAt(name, { [name]: value });
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+      setSigninErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
     } catch (error: any) {
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: error.errors[0] }));
+      setSigninErrors((prevErrors) => ({ ...prevErrors, [name]: error.errors[0] }));
     }
-    setFormData({ ...formData, [name]: value });
+    setSigninFormData({ ...signinFormData, [name]: value });
   };
 
   const handleLogin = async () => {
     try {
-      await signinValidationSchema.validate(formData, { abortEarly: false });
-      setErrors({});
+      await signinValidationSchema.validate(signinFormData, { abortEarly: false });
+      setSigninErrors({});
     } catch (err) {}
   };
 
   useEffect(() => {
-    if (formData.password.length > 4 && formData.username) {
-      setActiveLogin(true);
+    if (signinFormData.password.length > 4 && signinFormData.username) {
+      setActiveSignin(true);
     } else {
-      setActiveLogin(false);
+      setActiveSignin(false);
     }
-  }, [formData]);
+  }, [signinFormData]);
+
+  const handleSignupChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    console.log("test", name, value);
+    try {
+      await signupValidationSchema.validateAt(name, { [name]: value });
+      setSignupErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+    } catch (error: any) {
+      setSignupErrors((prevErrors) => ({ ...prevErrors, [name]: error.errors[0] }));
+    }
+    setSignupFormData({ ...signupFormData, [name]: value });
+  };
+
+  const handleSignup = async () => {
+    try {
+      await signupValidationSchema.validate(signupFormData, { abortEarly: false });
+      setSignupErrors({});
+    } catch (err) {}
+  };
+
+  useEffect(() => {
+    if (signupFormData.password.length > 4 && signupFormData.username) {
+      setActiveSignup(true);
+    } else {
+      setActiveSignup(false);
+    }
+  }, [signinFormData]);
 
   return (
     <div className={S.body}>
       <div className={S.wrapper}>
-        <div className={clsx(S.signin, active && S.slideUp)}>
-          <h2 className={S.formTitle}>Sign in</h2>
+        <div className={clsx(S.signin, state.context.mode && S.slideUp)}>
+          <h2
+            className={S.formTitle}
+            data-testid="signin-handle"
+            onClick={() => send({ type: "MODE", value: false })}
+          >
+            Sign in
+          </h2>
           <div className={S.socialHolder}>
             <a href="http://" target="_blank" rel="noopener noreferrer">
               <TfiGoogle size={20} />
@@ -66,49 +122,142 @@ export const AuthPanel = () => {
               type="text"
               name="username"
               id="username"
-              value={formData.username}
-              onChange={handleChange}
+              value={signinFormData.username}
+              onChange={handleSigninChange}
               placeholder="Name"
             />
-            <span className={S.error}>{errors.username}</span>
+            <span className={S.error}>{signinErrors.username}</span>
           </label>
           <label htmlFor="password">
             <input
               type="password"
               name="password"
               id="password"
-              value={formData.password}
-              onChange={handleChange}
+              value={signinFormData.password}
+              onChange={handleSigninChange}
               placeholder="Password"
             />
-            <span className={S.error}>{errors.password}</span>
+            <span className={S.error}>{signinErrors.password}</span>
           </label>
-          <button onClick={handleLogin} disabled={!activeLogin}>
+          <button onClick={handleLogin} disabled={!activeSignin}>
             Log in
           </button>
         </div>
-        <div className={clsx(S.signup, !active && S.slideUp)}>
+        <div className={clsx(S.signup, !state.context.mode && S.slideUp)}>
           <div className={S.center}>
-            <h2 className={S.formTitle}>Sign up</h2>
-            <div className={S.socialHolder}>
-              <a href="http://" target="_blank" rel="noopener noreferrer">
-                <TfiGoogle size={20} />
-              </a>
-              <a href="http://" target="_blank" rel="noopener noreferrer">
-                <TfiLinkedin size={20} />
-              </a>
-              <a href="http://" target="_blank" rel="noopener noreferrer">
-                <TfiGithub size={20} />
-              </a>
-              <a href="http://" target="_blank" rel="noopener noreferrer">
-                <TfiFacebook size={20} />
-              </a>
-            </div>
-            <span>or use your email for registration</span>
-            <input type="text" name="" id="" placeholder="Name" />
-            <input type="email" name="" id="" placeholder="Email" />
-            <input type="password" name="" id="" placeholder="Password" />
-            <button>Sign up</button>
+            <h2
+              className={S.formTitle}
+              data-testid="signup-handle"
+              onClick={() => send({ type: "MODE", value: true })}
+            >
+              Sign up
+            </h2>
+            {state.context.mode && (
+              <>
+                <div className={S.socialHolder} data-testid="signup-social">
+                  <a href="http://" target="_blank" rel="noopener noreferrer">
+                    <TfiGoogle size={20} />
+                  </a>
+                  <a href="http://" target="_blank" rel="noopener noreferrer">
+                    <TfiLinkedin size={20} />
+                  </a>
+                  <a href="http://" target="_blank" rel="noopener noreferrer">
+                    <TfiGithub size={20} />
+                  </a>
+                  <a href="http://" target="_blank" rel="noopener noreferrer">
+                    <TfiFacebook size={20} />
+                  </a>
+                </div>
+                <span>or use your email for registration</span>
+                <label htmlFor="firstName">
+                  <input
+                    type="text"
+                    name="firstName"
+                    id="firstName"
+                    data-testid="signup-firstName"
+                    value={signupFormData.firstName}
+                    onChange={handleSignupChange}
+                    placeholder="FirstName"
+                  />
+                  <span className={S.error} data-testid="signup-error-firstName">
+                    {signupErrors.firstName}
+                  </span>
+                </label>
+                <label htmlFor="lastName">
+                  <input
+                    type="text"
+                    name="lastName"
+                    id="lastName"
+                    data-testid="signup-lastName"
+                    value={signupFormData.lastName}
+                    onChange={handleSignupChange}
+                    placeholder="LastName"
+                  />
+                  <span className={S.error} data-testid="signup-error-lastName">
+                    {signupErrors.lastName}
+                  </span>
+                </label>
+                <label htmlFor="username">
+                  <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    data-testid="signup-username"
+                    value={signupFormData.username}
+                    onChange={handleSignupChange}
+                    placeholder="Username"
+                  />
+                  <span className={S.error} data-testid="signup-error-username">
+                    {signupErrors.username}
+                  </span>
+                </label>
+                <label htmlFor="email">
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    data-testid="signup-email"
+                    value={signupFormData.email}
+                    onChange={handleSignupChange}
+                    placeholder="Email"
+                  />
+                  <span className={S.error} data-testid="signup-error-email">
+                    {signupErrors.email}
+                  </span>
+                </label>
+                <label htmlFor="password">
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    data-testid="signup-password"
+                    value={signupFormData.password}
+                    onChange={handleSignupChange}
+                    placeholder="Password"
+                  />
+                  <span className={S.error} data-testid="signup-error-password">
+                    {signupErrors.password}
+                  </span>
+                </label>
+                <label htmlFor="confirmPassword">
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirmPassword"
+                    data-testid="signup-confirmPassword"
+                    value={signupFormData.confirmPassword}
+                    onChange={handleSignupChange}
+                    placeholder="Confirm"
+                  />
+                  <span className={S.error} data-testid="signup-error-confirmPassword">
+                    {signupErrors.confirmPassword}
+                  </span>
+                </label>
+                <button data-testid="signup-button" onClick={handleSignup} disabled={!activeSignup}>
+                  Sign up
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
