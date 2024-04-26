@@ -26,7 +26,6 @@ export const authMachine = setup({
   },
   actors: {
     performLogin: fromCallback(({ input, sendBack }) => {
-      console.log("dataa---->>>", input);
       httpClient
         .post(`http://localhost:${backendPort}/login`, input)
         .then(({ data }) => {

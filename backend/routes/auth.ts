@@ -1,8 +1,7 @@
 import express, { Request, Response } from "express";
-// import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import passport from "passport";
-import chalk from "chalk";
-import { getUserByMB, getuserByIdMB } from "../database/database";
+import { getUserBy, getuserById } from "../database/database";
 import { User } from "../../src/models/user";
 
 const LocalStrategy = require("passport-local").Strategy;
@@ -11,19 +10,17 @@ const router = express.Router();
 // configure passport for local strategy
 passport.use(
   new LocalStrategy(async (username: string, password: string, done: Function) => {
-    const user = await getUserByMB("username", username);
-    console.log(chalk.yellow("user", user, "\nPassword", password));
+    const user = await getUserBy("username", username);
 
     const failureMessage = "Incorrect username or password.";
     if (!user) {
-      console.log("user??????", user);
       return done(null, false, { message: failureMessage });
     }
 
-    //validate password
-    // if (!bcrypt.compareSync(password, user.password)) {
-    //   return done(null, false, { message: failureMessage });
-    // }
+    // validate password
+    if (!bcrypt.compareSync(password, user.password)) {
+      return done(null, false, { message: failureMessage });
+    }
 
     return done(null, user);
   })
@@ -38,7 +35,7 @@ passport.serializeUser((user: User, done) => {
 
 passport.deserializeUser(async (id: string, done) => {
   try {
-    const user = await getuserByIdMB(id);
+    const user = await getuserById(id);
     if (!user) {
       return done(new Error("User not found"));
     }
@@ -48,9 +45,9 @@ passport.deserializeUser(async (id: string, done) => {
     done(error);
   }
 });
+
 // authentication routes
 router.post("/login", passport.authenticate("local"), (req: Request, res: Response): void => {
-  console.log("Here is login router");
   if (req.body.remember) {
     req.session!.cookie.maxAge = 24 * 60 * 60 * 1000 * 30; // Expire in 30 days
   } else {

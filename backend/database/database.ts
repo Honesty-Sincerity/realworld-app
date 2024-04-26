@@ -46,9 +46,6 @@ export const removeUserFromResults = (userId: User["id"], results: User[]) =>
   remove(results, { id: userId });
 
 //User
-export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);
-export const getuserById = (id: string) => getUserBy("id", id);
-
 export const createUser = (userDetails: Partial<User>): User => {
   const password = bcrypt.hashSync(userDetails.password!, 10);
   const user: User = {
@@ -76,7 +73,7 @@ const saveUser = (user: User) => {
 };
 
 //User
-export const getUserByMB = async (key: string, value: any) => {
+export const getUserBy = async (key: string, value: any) => {
   try {
     console.log("key", key);
     const data = await UserModel.findOne({ [key]: value }).exec();
@@ -86,12 +83,48 @@ export const getUserByMB = async (key: string, value: any) => {
   }
 };
 
-export const getuserByIdMB = async (id: string) => {
+export const getuserById = async (id: string) => {
   try {
     const user = await UserModel.findById(id);
     return user;
   } catch (error) {
     console.error("Error fetching user by id:", error);
     return null;
+  }
+};
+
+export const createUserMB = async (userDetails: Partial<User>) => {
+  const password = bcrypt.hashSync(userDetails.password!, 10);
+
+  const user = new UserModel({
+    id: shortId(),
+    uuid: v4(),
+    firstName: userDetails.firstName,
+    lastName: userDetails.lastName,
+    username: userDetails.username,
+    password,
+    email: userDetails.email,
+    phoneNumber: userDetails.phoneNumber,
+    balance: userDetails.balance || 0,
+    avatar: userDetails.avatar,
+    defaultPrivacyLevel: userDetails.defaultPrivacyLevel,
+    createdAt: new Date(),
+    modifiedAt: new Date(),
+  });
+
+  try {
+    const dataSave = await user.save();
+    return dataSave;
+  } catch (error) {
+    console.log(chalk.red("Error occure in save user:", error));
+  }
+};
+
+export const checkUserByName = async (username: string) => {
+  try {
+    const user = await UserModel.findOne({ username: username }).exec();
+    return user;
+  } catch (error) {
+    console.log(chalk.red(`Error occure in find user by username: `, error));
   }
 };
