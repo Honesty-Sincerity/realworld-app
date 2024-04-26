@@ -14,10 +14,6 @@ function App() {
 
   const [authState] = useMachine(authMachine);
 
-  useEffect(() => {
-    console.log(authState.matches("unauthorized"));
-  }, [authState]);
-
   return (
     <RouterWrap history={history}>
       <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>

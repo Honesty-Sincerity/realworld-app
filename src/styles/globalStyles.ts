@@ -11,6 +11,7 @@ html {
     background-color: ${({ theme }) => theme.body};
     color: ${({ theme }) => theme.text};
     transition: all 0.5s linear;
+    font-family: "Archivo Narrow", sans-serif;
 }
 `;
 
