@@ -85,7 +85,7 @@ export const getUserBy = async (key: string, value: any) => {
 
 export const getuserById = async (id: string) => {
   try {
-    const user = await UserModel.findById(id);
+    const user = await UserModel.findOne({ id: id });
     return user;
   } catch (error) {
     console.error("Error fetching user by id:", error);

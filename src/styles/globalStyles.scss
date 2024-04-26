@@ -8,6 +8,22 @@ $breakpoints: (
   "xxl": 1920px,
 );
 
+html {
+  --bodyBGColor: #fffeff;
+  --textColor: #0f0e11;
+  --cardBGColor: #124e85;
+  --cardShadow: #0c4376;
+  --cardTextColor: #fff;
+  --authAnimation: all 0.3s ease;
+  --circleBGColor: #1f97c1;
+}
+
+html[data-theme=""] {
+  --bodyBGColor: #fffeff;
+  --textColor: #0f0e11;
+  --cardBGColor: #124e85;
+}
+
 @mixin breakpoint($name) {
   @media (min-width: map-get($breakpoints, $name)) {
     @content;
@@ -19,7 +35,16 @@ $breakpoints: (
   align-items: center;
 }
 
+@mixin flexCenter {
+  @include flexAlignCenter;
+  justify-content: center;
+}
+
 @mixin alert {
   @include flexAlignCenter;
   padding: 6px 16px;
+}
+
+@mixin authBorderRadius {
+  border-radius: 15px;
 }

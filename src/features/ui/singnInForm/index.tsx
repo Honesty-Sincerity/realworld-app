@@ -35,6 +35,7 @@ export function SignInForm() {
         {authState.context.message && (
           <div className={S.alert}>
             <AiOutlineInfoCircle className={S.alertIcon} />
+            {authState.context.message}
           </div>
         )}
         <h5>Sign In</h5>

@@ -7,7 +7,7 @@ export const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
 }
 
-body {
+html {
     background-color: ${({ theme }) => theme.body};
     color: ${({ theme }) => theme.text};
     transition: all 0.5s linear;
@@ -15,11 +15,13 @@ body {
 `;
 
 export const lightTheme = {
-  body: "#fff",
-  text: "#363537",
+  body: "#fffeff",
+  text: "#0f0e11",
+  cardColor: "#124e85",
 };
 
 export const darkTheme = {
   body: "#363537",
   text: "#fafafa",
+  cardColor: "#124e85",
 };

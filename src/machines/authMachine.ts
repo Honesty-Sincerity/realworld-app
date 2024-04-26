@@ -3,7 +3,7 @@ import { httpClient } from "@utils/asyncUtils";
 import { history } from "@utils/historyUtils";
 import { backendPort } from "@utils/portUtils";
 import { omit } from "lodash";
-import { assign, fromCallback, setup } from "xstate";
+import { assign, fromCallback, fromPromise, setup } from "xstate";
 
 export interface AuthMachineContext {
   user?: User;
@@ -23,17 +23,21 @@ export const authMachine = setup({
     resetUser: assign(() => ({
       user: undefined,
     })),
+    onError: assign(() => ({
+      message: "Username or password is invalid",
+    })),
   },
   actors: {
-    performLogin: fromCallback(({ input, sendBack }) => {
-      httpClient
+    performLogin: fromPromise(async ({ input }) => {
+      return await httpClient
         .post(`http://localhost:${backendPort}/login`, input)
         .then(({ data }) => {
+          console.log("here correct");
           history.push("/");
-          sendBack(data);
+          return data;
         })
-        .catch(() => {
-          // sendBack({ message: "Username or password is invalid" });
+        .catch((error) => {
+          console.log("errrrrrrr", error);
           throw new Error("Username or password is invalid");
         });
     }),
@@ -65,6 +69,18 @@ export const authMachine = setup({
         input: ({ event }: { event: any }) => {
           return omit(event, "type");
         },
+        // onError: { target: "unauthorized", actions: "onError" },
+        onError: [
+          {
+            target: "unauthorized",
+            actions: assign(({ event }) => {
+              console.log("user", event);
+              return {
+                message: "Invalid user or password",
+              };
+            }),
+          },
+        ],
       },
     },
     signup: {
