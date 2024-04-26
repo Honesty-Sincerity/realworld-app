@@ -1,10 +1,8 @@
 ///<reference path="../types.ts"/>
 
 import express from "express";
-// import { getAllForEntity, seedDatabase } from "../database/database";
-// import { validateMiddleware } from "../helpers";
-// import { isValidEntityValidator } from "../validators";
-// import { DbSchema } from "models/db-schema";
+import { validateMiddleware } from "../helpers";
+import { isValidEntityValidator } from "../validators";
 
 const router = express.Router();
 
@@ -17,12 +15,12 @@ router.post("/seed", (_, res) => {
 });
 
 //GET /testData/:entity
-// router.get("/:entity", validateMiddleware([...isValidEntityValidator]), (req, res) => {
-// const { entity } = req.params;
-// const results = getAllForEntity(entity as keyof DbSchema);
+router.get("/:entity", validateMiddleware([...isValidEntityValidator]), (req, res) => {
+  const { entity } = req.params;
+  // const results = getAllForEntity(entity as keyof DbSchema);
 
-// res.status(200);
-// res.json({ results });
-// });
+  res.status(200);
+  res.json({ entity });
+});
 
 export default router;

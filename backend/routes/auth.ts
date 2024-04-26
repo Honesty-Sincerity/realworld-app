@@ -1,7 +1,8 @@
 import express, { Request, Response } from "express";
 // import bcrypt from "bcryptjs";
 import passport from "passport";
-import { getUserBy, getuserById } from "../database/database";
+import chalk from "chalk";
+import { getUserByMB, getuserByIdMB } from "../database/database";
 import { User } from "../../src/models/user";
 
 const LocalStrategy = require("passport-local").Strategy;
@@ -9,9 +10,9 @@ const router = express.Router();
 
 // configure passport for local strategy
 passport.use(
-  new LocalStrategy((username: string, password: string, done: Function) => {
-    console.log(username, password);
-    const user = getUserBy("username", username);
+  new LocalStrategy(async (username: string, password: string, done: Function) => {
+    const user = await getUserByMB("username", username);
+    console.log(chalk.yellow("user", user, "\nPassword", password));
 
     const failureMessage = "Incorrect username or password.";
     if (!user) {
@@ -29,14 +30,24 @@ passport.use(
 );
 
 passport.serializeUser((user: User, done) => {
+  if (!user || !user.id) {
+    return done(new Error("Invalid user object"));
+  }
   done(null, user.id);
 });
 
-passport.deserializeUser((id: string, done) => {
-  const user = getuserById(id);
-  done(null, user);
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await getuserByIdMB(id);
+    if (!user) {
+      return done(new Error("User not found"));
+    }
+    done(null, user);
+  } catch (error) {
+    console.error("Error deserializing user:", error);
+    done(error);
+  }
 });
-
 // authentication routes
 router.post("/login", passport.authenticate("local"), (req: Request, res: Response): void => {
   console.log("Here is login router");

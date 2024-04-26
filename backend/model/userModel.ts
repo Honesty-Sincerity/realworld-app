@@ -21,6 +21,6 @@ const userSchema = new mongoose.Schema<User>({
   modifiedAt: Date,
 });
 
-const UserModel = mongoose.model("User", userSchema);
+const UserModel = mongoose.model("Users", userSchema);
 
-export { UserModel }; // Export UserModel as a named export
+export { UserModel };

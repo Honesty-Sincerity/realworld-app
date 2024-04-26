@@ -36,7 +36,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-const URI = process.env.MONGO_DB || "";
+const URI = process.env.MONGO_DB + process.env.DB_NAME!;
 
 mongoose
   .connect(URI)
