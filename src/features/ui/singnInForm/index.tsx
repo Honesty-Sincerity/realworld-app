@@ -1,7 +1,7 @@
 import { authMachine } from "@machines/authMachine";
 import S from "./index.module.scss";
 import { SignInPayload } from "@models/user";
-import { useActor, useMachine } from "@xstate/react";
+import { useMachine } from "@xstate/react";
 import { Field, Form, Formik } from "formik";
 import { useEffect } from "react";
 import { object, string } from "yup";

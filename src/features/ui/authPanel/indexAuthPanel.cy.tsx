@@ -1,8 +1,23 @@
+import { authMachine } from "@machines/authMachine";
 import { AuthPanel } from "./index";
 import { MemoryRouter } from "react-router-dom";
+import { createActor } from "xstate";
 
 describe("Authenticate Unit Test", () => {
-  beforeEach(() => {});
+  let authService;
+
+  beforeEach(() => {
+    authService = createActor(authMachine);
+    authService.start();
+
+    expect(authService.getSnapshot().value).equal("unauthorized");
+    cy.intercept("POST", "http://localhost:4001/login", {
+      user: {
+        username: "Katharina_Bernier",
+        password: "$2a$10$5PXHGtcsckWtAprT5/JmluhR13f16BL8SIGhvAKNP.Dhxkt69FfzW",
+      },
+    }).as("loginPost");
+  });
 
   it("chage mode to signup and check the all input filed", () => {
     cy.mount(
@@ -27,7 +42,7 @@ describe("Authenticate Unit Test", () => {
     cy.getByData("signup-error-confirmPassword").should("contain", "No mached");
   });
 
-  it.only("chage mode to signup and click signup", () => {
+  it("chage mode to signup and click signup", () => {
     cy.mount(
       <MemoryRouter>
         <AuthPanel />
@@ -43,5 +58,27 @@ describe("Authenticate Unit Test", () => {
     cy.getByData("signup-password").type("2037886");
     cy.getByData("signup-confirmPassword").type("2037886");
     cy.getByData("signup-button").click();
+
+    // cy.wait("@signup");
+  });
+
+  it.only("check the signin panel filds", () => {
+    cy.mount(
+      <MemoryRouter>
+        <AuthPanel />
+      </MemoryRouter>
+    );
+    cy.getByData("signin-social").should("exist");
+    cy.getByData("signin-username").type("1{backspace}");
+    cy.getByData("signin-error-username").should("contain", "Username is required");
+    cy.getByData("signin-password").type("203");
+    cy.getByData("signin-error-password").should("contain", "Least 4 characters");
+    cy.getByData("signin-button").should("be.disabled");
+    cy.getByData("signin-username").type("Oliver");
+    cy.getByData("signin-password").type("7886");
+    cy.getByData("signin-button").should("be.enabled");
+    cy.getByData("signin-button").click();
+
+    // cy.wait("@loginPost");
   });
 });

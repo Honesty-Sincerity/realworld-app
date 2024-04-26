@@ -85,6 +85,7 @@
         width: 70%;
         z-index: 5;
         // -webkit-transform: translate(0, -50%);
+        position: relative;
 
         .formTitle {
           color: var(--cardBGColor);
@@ -191,21 +192,28 @@
         cursor: auto;
       }
     }
-  }
 
-  label {
-    width: 100%;
-    position: relative;
-  }
+    label {
+      width: 100%;
+      position: relative;
+    }
 
-  .error {
-    color: var(--errorColor);
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    margin-bottom: 6px;
-    position: absolute;
-    bottom: 0;
-    transform: translate(10px, 15px);
+    .error {
+      color: var(--errorColor);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-bottom: 6px;
+      position: absolute;
+      bottom: 0;
+      transform: translate(10px, 15px);
+    }
+
+    .notice {
+      position: absolute;
+      top: -20px;
+      color: var(--errorColor) !important;
+      font-weight: 700;
+    }
   }
 }
