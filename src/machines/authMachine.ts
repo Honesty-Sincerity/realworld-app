@@ -1,4 +1,4 @@
-import { SignInPayload, SignUpPayload, User } from "@models/user";
+import { User } from "@models/user";
 import { httpClient } from "@utils/asyncUtils";
 import { history } from "@utils/historyUtils";
 import { backendPort } from "@utils/portUtils";
@@ -48,13 +48,14 @@ export const authMachine = setup({
         });
     }),
     performSignup: fromPromise(async ({ input }) => {
-      console.log("input---", input);
-      const data = await httpClient.post(`http://localhost:${backendPort}/signup`, input);
-      return data;
-      // httpClient.post(`http://localhost:${backendPort}/users`, input).then(({ data }) => {
-      //   history.push("/signin");
-      //   sendBack(data);
-      // });
+      return await httpClient
+        .post(`http://localhost:${backendPort}/users`, input)
+        .then(({ data }) => {
+          return data;
+        })
+        .catch(() => {
+          throw new Error("User already taken");
+        });
     }),
   },
 }).createMachine({
@@ -103,6 +104,14 @@ export const authMachine = setup({
         onDone: {
           actions: "signinMode",
         },
+        onError: [
+          {
+            target: "unauthorized",
+            actions: assign(() => {
+              return { message: "User already" };
+            }),
+          },
+        ],
       },
     },
   },

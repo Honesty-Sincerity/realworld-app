@@ -5,7 +5,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { object, string } from "yup";
 import { useMachine } from "@xstate/react";
 import { authMachine } from "@machines/authMachine";
-import { SignUpPayload } from "@models/user";
+import { SignInPayload, SignUpPayload } from "@models/user";
 
 const signinValidationSchema = object({
   username: string().required("Username is required"),
@@ -48,10 +48,13 @@ export const AuthPanel = () => {
     setSigninFormData({ ...signinFormData, [name]: value });
   };
 
+  const signinPending = (payload: SignInPayload) => send({ type: "LOGIN", ...payload });
+
   const handleLogin = async () => {
     try {
       await signinValidationSchema.validate(signinFormData, { abortEarly: false });
       setSigninErrors({});
+      signinPending(signinFormData);
     } catch (err) {}
   };
 
@@ -114,46 +117,56 @@ export const AuthPanel = () => {
           >
             Sign in
           </h2>
-          <div className={S.socialHolder}>
-            <a href="http://" target="_blank" rel="noopener noreferrer">
-              <TfiGoogle size={20} />
-            </a>
-            <a href="http://" target="_blank" rel="noopener noreferrer">
-              <TfiLinkedin size={20} />
-            </a>
-            <a href="http://" target="_blank" rel="noopener noreferrer">
-              <TfiGithub size={20} />
-            </a>
-            <a href="http://" target="_blank" rel="noopener noreferrer">
-              <TfiFacebook size={20} />
-            </a>
-          </div>
-          <span>or use your account</span>
-          <label htmlFor="username">
-            <input
-              type="text"
-              name="username"
-              id="username"
-              value={signinFormData.username}
-              onChange={handleSigninChange}
-              placeholder="Name"
-            />
-            <span className={S.error}>{signinErrors.username}</span>
-          </label>
-          <label htmlFor="password">
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={signinFormData.password}
-              onChange={handleSigninChange}
-              placeholder="Password"
-            />
-            <span className={S.error}>{signinErrors.password}</span>
-          </label>
-          <button onClick={handleLogin} disabled={!activeSignin}>
-            Log in
-          </button>
+          {!state.context.mode && (
+            <>
+              <div className={S.socialHolder} data-testid="signin-social">
+                <a href="http://" target="_blank" rel="noopener noreferrer">
+                  <TfiGoogle size={20} />
+                </a>
+                <a href="http://" target="_blank" rel="noopener noreferrer">
+                  <TfiLinkedin size={20} />
+                </a>
+                <a href="http://" target="_blank" rel="noopener noreferrer">
+                  <TfiGithub size={20} />
+                </a>
+                <a href="http://" target="_blank" rel="noopener noreferrer">
+                  <TfiFacebook size={20} />
+                </a>
+              </div>
+              <span>or use your account</span>
+              <label htmlFor="username">
+                <input
+                  type="text"
+                  name="username"
+                  id="username"
+                  data-testid="signin-username"
+                  value={signinFormData.username}
+                  onChange={handleSigninChange}
+                  placeholder="Name"
+                />
+                <span className={S.error} data-testid="signin-error-username">
+                  {signinErrors.username}
+                </span>
+              </label>
+              <label htmlFor="password">
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  data-testid="signin-password"
+                  value={signinFormData.password}
+                  onChange={handleSigninChange}
+                  placeholder="Password"
+                />
+                <span className={S.error} data-testid="signin-error-password">
+                  {signinErrors.password}
+                </span>
+              </label>
+              <button data-testid="signin-button" onClick={handleLogin} disabled={!activeSignin}>
+                Log in
+              </button>
+            </>
+          )}
         </div>
         <div className={clsx(S.signup, !state.context.mode && S.slideUp)}>
           <div className={S.center}>
@@ -164,6 +177,7 @@ export const AuthPanel = () => {
             >
               Sign up
             </h2>
+            {state.context.message && <span className={S.notice}>{state.context.message}</span>}
             {state.context.mode && (
               <>
                 <div className={S.socialHolder} data-testid="signup-social">
