@@ -3,7 +3,7 @@ import { httpClient } from "@utils/asyncUtils";
 import { history } from "@utils/historyUtils";
 import { backendPort } from "@utils/portUtils";
 import { omit } from "lodash";
-import { assign, fromCallback, fromPromise, setup } from "xstate";
+import { assign, fromPromise, setup } from "xstate";
 
 export interface AuthMachineContext {
   user?: User;
@@ -29,10 +29,10 @@ export const authMachine = setup({
       message: "Username or password is invalid",
     })),
     onChange: assign({
-      mode: (event: any) => {
-        console.log(event.event.value);
-        return event.event.value;
-      },
+      mode: (event: any) => event.event.value,
+    }),
+    signinMode: assign({
+      mode: false,
     }),
   },
   actors: {
@@ -40,20 +40,21 @@ export const authMachine = setup({
       return await httpClient
         .post(`http://localhost:${backendPort}/login`, input)
         .then(({ data }) => {
-          console.log("here correct");
           history.push("/");
           return data;
         })
-        .catch((error) => {
-          console.log("errrrrrrr", error);
+        .catch(() => {
           throw new Error("Username or password is invalid");
         });
     }),
-    performSignup: fromCallback(({ input, sendBack }) => {
-      httpClient.post(`http://localhost:${backendPort}/users`, input).then(({ data }) => {
-        history.push("/signin");
-        sendBack(data);
-      });
+    performSignup: fromPromise(async ({ input }) => {
+      console.log("input---", input);
+      const data = await httpClient.post(`http://localhost:${backendPort}/signup`, input);
+      return data;
+      // httpClient.post(`http://localhost:${backendPort}/users`, input).then(({ data }) => {
+      //   history.push("/signin");
+      //   sendBack(data);
+      // });
     }),
   },
 }).createMachine({
@@ -84,8 +85,7 @@ export const authMachine = setup({
         onError: [
           {
             target: "unauthorized",
-            actions: assign(({ event }) => {
-              console.log("user", event);
+            actions: assign(() => {
               return {
                 message: "Invalid user or password",
               };
@@ -98,7 +98,10 @@ export const authMachine = setup({
       invoke: {
         src: "performSignup",
         input: ({ event }: { event: any }) => {
-          return omit(event, "type");
+          return omit(event, "type", "confirmPassword");
+        },
+        onDone: {
+          actions: "signinMode",
         },
       },
     },
