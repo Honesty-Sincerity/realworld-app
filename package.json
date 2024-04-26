@@ -8,6 +8,7 @@
     "start:api:watch": "nodemon --exec yarn tsnode --watch 'backend' backend/app.ts",
     "tsnode": "ts-node -P tsconfig.tsnode.json",
     "cypress:open": "cypress open",
+    "cypress:open:mobile": "concurrently yarn:cypress:open --config viewportWidth=375 --config viewportHeight=812",
     "cypress:run": "cypress run",
     "test": "yarn cypress:open",
     "test:api": "yarn cypress:run --spec 'cypress/tests/api/*'",
