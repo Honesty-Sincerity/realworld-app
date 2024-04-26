@@ -2,9 +2,10 @@ import S from "./index.module.scss";
 import { TfiFacebook, TfiGithub, TfiGoogle, TfiLinkedin } from "react-icons/tfi";
 import clsx from "clsx";
 import { ChangeEvent, useEffect, useState } from "react";
-import { object, ref, string } from "yup";
+import { object, string } from "yup";
 import { useMachine } from "@xstate/react";
 import { authMachine } from "@machines/authMachine";
+import { SignUpPayload } from "@models/user";
 
 const signinValidationSchema = object({
   username: string().required("Username is required"),
@@ -16,10 +17,8 @@ const signupValidationSchema = object({
   lastName: string().required("LastName is required"),
   username: string().required("Username is required"),
   email: string().email("Invalid eamil format"),
-  password: string().min(4, "Least 4 characters").required("Password is required"),
-  confirmPassword: string()
-    .oneOf([ref("password"), ""], "Passwords must match")
-    .required("Confirm password is required"),
+  password: string().min(4, "Least 4 characters").required("Enter your password"),
+  confirmPassword: string().required("Confirm your password"),
 });
 
 export const AuthPanel = () => {
@@ -66,30 +65,43 @@ export const AuthPanel = () => {
 
   const handleSignupChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    console.log("test", name, value);
     try {
       await signupValidationSchema.validateAt(name, { [name]: value });
-      setSignupErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+      if (name === "confirmPassword" && value !== signupFormData.password) {
+        setSignupErrors((prevErrors) => ({ ...prevErrors, confirmPassword: "No mached" }));
+      } else {
+        setSignupErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+      }
     } catch (error: any) {
       setSignupErrors((prevErrors) => ({ ...prevErrors, [name]: error.errors[0] }));
     }
     setSignupFormData({ ...signupFormData, [name]: value });
   };
 
+  const signUpPending = (payload: SignUpPayload) => send({ type: "SIGNUP", ...payload });
+
   const handleSignup = async () => {
     try {
       await signupValidationSchema.validate(signupFormData, { abortEarly: false });
       setSignupErrors({});
+      signUpPending(signupFormData);
     } catch (err) {}
   };
 
   useEffect(() => {
-    if (signupFormData.password.length > 4 && signupFormData.username) {
+    if (
+      signupFormData.password.length > 4 &&
+      signupFormData.password === signupFormData.confirmPassword &&
+      signupFormData.username &&
+      signupFormData.firstName &&
+      signupFormData.lastName &&
+      signupFormData.email
+    ) {
       setActiveSignup(true);
     } else {
       setActiveSignup(false);
     }
-  }, [signinFormData]);
+  }, [signupFormData]);
 
   return (
     <div className={S.body}>

@@ -118,6 +118,13 @@
       }
     }
 
+    form {
+      width: 100%;
+      @include G.flexAlignCenter;
+      flex-direction: column;
+      gap: 0;
+    }
+
     .formTitle {
       font-size: 1.7em;
       text-align: center;
